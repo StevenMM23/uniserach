@@ -9,7 +9,7 @@ export default function Search() {
   
   return (
     <div>
-      <h1>Search Results for {query}</h1>
+      
       <SearchResults query={query} />
     </div>
   );
