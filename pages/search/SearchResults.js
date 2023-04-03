@@ -12,37 +12,51 @@ import { styled } from "@mui/material/styles";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import ScrollTopButton from "@/components/ScrollTopButton";
 import IconButton from "@mui/material/IconButton";
+import WordDefinition from "@/components/WordDefinition";
 
 const SearchResults = ({ query }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const router = useRouter();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [definitions, setDefinitions] = useState([]);
+  const [image, setImage] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    async function fetchData() {
       setLoading(true);
       try {
         const {
           data: { results },
         } = await axios.get(
           `https://api.nickravchenko.rocks/api/search/?q=${query}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { "Content-Type": "application/json" } }
         );
-
         setData(results);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    };
+    }
+
+    async function fetchDefinition() {
+      try {
+        const { data } = await axios.get(`/api/owlbot?query=${query}`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        
+        setDefinitions(() => data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
     fetchData();
+    fetchDefinition();
   }, [query]);
+
+ 
 
   const truncateText = (text, maxLength) => {
     if (!text) return "";
@@ -52,7 +66,7 @@ const SearchResults = ({ query }) => {
       return text;
     }
   };
-
+  console.log(definitions);
   const handleSubmit = (event, inputValue) => {
     event.preventDefault();
     router.push(`/search/${inputValue}`);
@@ -60,7 +74,7 @@ const SearchResults = ({ query }) => {
 
   const Root = styled("div")(({ theme }) => ({
     margin: "auto",
-    maxWidth: 800,
+    maxWidth: "70%",
     padding: theme.spacing(2),
   }));
 
@@ -78,11 +92,6 @@ const SearchResults = ({ query }) => {
     margin: theme.spacing(2, 0),
   }));
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const handleScroll = () => {
     if (window.scrollY > 100) {
       setShowScrollTop(true);
@@ -99,44 +108,50 @@ const SearchResults = ({ query }) => {
   };
 
   return (
-    <Root>
-      <SearchInput onSubmit={handleSubmit} />
-      {loading ? (
-        <LinearProgress color="primary" />
-      ) : (
-        <>
-          <Title variant="h5" component="h2">
-            Search Results for {query}
-          </Title>
-          {data.length === 0 && (
-            <Typography variant="body1" component="p">
-              No se encontraron resultados para {query}.
-            </Typography>
-          )}
-          <List>
-            {data.map(({ title, content, url }) => (
-              <ListItem key={uuidv4()}>
-                <Link href={url} passHref>
-                  <Typography variant="h6" component="a">
-                    {truncateText(title, 50)}
-                  </Typography>
-                </Link>
+    <div style={{ display: "flex" }}>
+      <Root>
+        <div>
+          <SearchInput onSubmit={handleSubmit} />
+          {loading ? (
+            <LinearProgress color="primary" />
+          ) : (
+            <>
+              <Title variant="h5" component="h2">
+                Search Results for {query}
+              </Title>
+              {data.length === 0 && (
                 <Typography variant="body1" component="p">
-                  {truncateText(content, 150)}
+                  No se encontraron resultados para {query}.
                 </Typography>
-              </ListItem>
-            ))}
-          </List>
-        </>
-      )}
-      {showScrollTop && (
-        <ScrollTopButton onClick={handleScrollTop}>
-          <IconButton>
-            <KeyboardArrowUpIcon />
-          </IconButton>
-        </ScrollTopButton>
-      )}
-    </Root>
+              )}
+              <List>
+                {data.map(({ title, content, url }) => (
+                  <ListItem key={uuidv4()}>
+                    <Link href={url} passHref>
+                      <Typography variant="h6" component="a">
+                        {title}
+                      </Typography>
+                    </Link>
+                    <Typography variant="body1" component="p">
+                      {truncateText(content, 150)}
+                    </Typography>
+                  </ListItem>
+                ))}
+              </List>
+            </>
+          )}
+          {showScrollTop && (
+            <ScrollTopButton onClick={handleScrollTop}>
+              <IconButton>
+                <KeyboardArrowUpIcon />
+              </IconButton>
+            </ScrollTopButton>
+          )}
+        </div>
+      </Root>
+      <WordDefinition myData={definitions} query={query} />
+      
+    </div>
   );
 };
 
