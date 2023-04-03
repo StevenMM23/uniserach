@@ -1,22 +1,31 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { v4 as uuidv4 } from "uuid";
 
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import SearchInput from "@/components/SearchInput";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
+
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import ScrollTopButton from "@/components/ScrollTopButton";
+import IconButton from "@mui/material/IconButton";
 
 const SearchResults = ({ query }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const router = useRouter();
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(
+        const {
+          data: { results },
+        } = await axios.get(
           `https://api.nickravchenko.rocks/api/search/?q=${query}`,
           {
             headers: {
@@ -24,8 +33,8 @@ const SearchResults = ({ query }) => {
             },
           }
         );
-        console.log(data.results); // verifica si los resultados son devueltos correctamente
-        setData(data.results);
+
+        setData(results);
       } catch (error) {
         console.log(error);
       }
@@ -46,7 +55,7 @@ const SearchResults = ({ query }) => {
 
   const handleSubmit = (event, inputValue) => {
     event.preventDefault();
-    Router.push(`/search/${inputValue}`);
+    router.push(`/search/${inputValue}`);
   };
 
   const Root = styled("div")(({ theme }) => ({
@@ -69,6 +78,26 @@ const SearchResults = ({ query }) => {
     margin: theme.spacing(2, 0),
   }));
 
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleScroll = () => {
+    if (window.scrollY > 100) {
+      setShowScrollTop(true);
+    } else {
+      setShowScrollTop(false);
+    }
+  };
+
+  const handleScrollTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <Root>
       <SearchInput onSubmit={handleSubmit} />
@@ -85,13 +114,13 @@ const SearchResults = ({ query }) => {
             </Typography>
           )}
           <List>
-            {data.map(({ title, content, url }, index) => (
-              <ListItem key={index}>
-                <Typography variant="h5" component="h2">
-                  <a href={url} target="_blank" rel="noopener">
-                    {title}
-                  </a>
-                </Typography>
+            {data.map(({ title, content, url }) => (
+              <ListItem key={uuidv4()}>
+                <Link href={url} passHref>
+                  <Typography variant="h6" component="a">
+                    {truncateText(title, 50)}
+                  </Typography>
+                </Link>
                 <Typography variant="body1" component="p">
                   {truncateText(content, 150)}
                 </Typography>
@@ -99,6 +128,13 @@ const SearchResults = ({ query }) => {
             ))}
           </List>
         </>
+      )}
+      {showScrollTop && (
+        <ScrollTopButton onClick={handleScrollTop}>
+          <IconButton>
+            <KeyboardArrowUpIcon />
+          </IconButton>
+        </ScrollTopButton>
       )}
     </Root>
   );

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
@@ -27,28 +27,40 @@ const SearchButton = styled(IconButton)({
   padding: "10px",
 });
 
+const UniSearch = styled("h1")({
+  fontSize: "5rem",
+  textAlign: "center",
+  margin: "0",
+  padding: "0",
+});
+
 const Search = () => {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    router.push(`/search/${query}`);
+    if (query !== "") {
+      router.push(`/search/${query}`);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <SearchContainer>
-        <SearchInput
-          placeholder="Search..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <SearchButton type="submit">
-          <SearchIcon />
-        </SearchButton>
-      </SearchContainer>
-    </form>
+    <>
+      <UniSearch>UniSearch</UniSearch>
+      <form onSubmit={handleSubmit}>
+        <SearchContainer>
+          <SearchInput
+            placeholder="Search..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <SearchButton type="submit">
+            <SearchIcon />
+          </SearchButton>
+        </SearchContainer>
+      </form>
+    </>
   );
 };
 
