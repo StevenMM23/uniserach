@@ -45,7 +45,7 @@ const SearchResults = ({ query }) => {
         const { data } = await axios.get(`/api/owlbot?query=${query}`, {
           headers: { "Content-Type": "application/json" },
         });
-        
+
         setDefinitions(() => data);
       } catch (error) {
         console.log(error);
@@ -55,8 +55,6 @@ const SearchResults = ({ query }) => {
     fetchData();
     fetchDefinition();
   }, [query]);
-
- 
 
   const truncateText = (text, maxLength) => {
     if (!text) return "";
@@ -74,31 +72,69 @@ const SearchResults = ({ query }) => {
 
   const Root = styled("div")(({ theme }) => ({
     margin: "auto",
-    maxWidth: "70%",
+    maxWidth: "50%",
     padding: theme.spacing(2),
+  }));
+
+  const ListItem = styled("li")(({ theme }) => ({
+    margin: theme.spacing(2, 0),
+    padding: "20px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.05)",
+    "&:hover": {
+      background: "#f2f2f2",
+    },
+    "& > a": {
+      display: "block",
+      marginBottom: "10px",
+      textDecoration: "none",
+      "&:hover": {
+        textDecoration: "underline",
+      },
+    },
   }));
 
   const Title = styled(Typography)(({ theme }) => ({
     margin: theme.spacing(2, 0),
+    fontSize: "22px",
+    fontWeight: "bold",
+  }));
+
+  const Url = styled(Typography)(({ theme }) => ({
+    display: "block",
+    color: "#666",
+    fontSize: "14px",
+    marginBottom: "10px",
+  }));
+
+  const Content = styled(Typography)(({ theme }) => ({
+    fontSize: "16px",
+    color: "#555",
   }));
 
   const List = styled("ul")({
     listStyle: "none",
     padding: 0,
     margin: 0,
+    borderTop: "1px solid #ddd",
+    borderBottom: "1px solid #ddd",
   });
 
-  const ListItem = styled("li")(({ theme }) => ({
-    margin: theme.spacing(2, 0),
-  }));
-
-  const handleScroll = () => {
-    if (window.scrollY > 100) {
-      setShowScrollTop(true);
-    } else {
-      setShowScrollTop(false);
-    }
-  };
+  const ScrollTopButton = styled("div")({
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    backgroundColor: "#fff",
+    borderRadius: "50%",
+    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.05)",
+    cursor: "pointer",
+    transition: "all 0.2s ease-in-out",
+    "&:hover": {
+      transform: "scale(1.1)",
+      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
+    },
+  });
 
   const handleScrollTop = () => {
     window.scrollTo({
@@ -128,13 +164,16 @@ const SearchResults = ({ query }) => {
                 {data.map(({ title, content, url }) => (
                   <ListItem key={uuidv4()}>
                     <Link href={url} passHref>
-                      <Typography variant="h6" component="a">
+                      <Title variant="h6" component="a">
                         {title}
-                      </Typography>
+                      </Title>
                     </Link>
-                    <Typography variant="body1" component="p">
+                    <Url variant="subtitle2" component="span">
+                      {new URL(url).hostname}
+                    </Url>
+                    <Content variant="body1" component="p">
                       {truncateText(content, 150)}
-                    </Typography>
+                    </Content>
                   </ListItem>
                 ))}
               </List>
@@ -150,7 +189,6 @@ const SearchResults = ({ query }) => {
         </div>
       </Root>
       <WordDefinition myData={definitions} query={query} />
-      
     </div>
   );
 };

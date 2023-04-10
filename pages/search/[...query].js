@@ -9,7 +9,6 @@ export default function Search() {
   
   return (
     <div>
-      
       <SearchResults query={query} />
     </div>
   );
