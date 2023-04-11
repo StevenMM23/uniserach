@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
@@ -10,17 +11,16 @@ import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import ScrollTopButton from "@/components/ScrollTopButton";
 import IconButton from "@mui/material/IconButton";
 import WordDefinition from "@/components/WordDefinition";
+import { Grid } from "@mui/material";
 
 const SearchResults = ({ query }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const router = useRouter();
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [definitions, setDefinitions] = useState([]);
-  const [image, setImage] = useState("");
+
 
   useEffect(() => {
     async function fetchData() {
@@ -42,11 +42,10 @@ const SearchResults = ({ query }) => {
 
     async function fetchDefinition() {
       try {
-        const { data } = await axios.get(`/api/owlbot?query=${query}`, {
-          headers: { "Content-Type": "application/json" },
-        });
-
+        const { data } = await axios.post(`/api/owlbot?q=${query}`);
+        console.log(data);
         setDefinitions(() => data);
+        
       } catch (error) {
         console.log(error);
       }
@@ -64,7 +63,7 @@ const SearchResults = ({ query }) => {
       return text;
     }
   };
-  console.log(definitions);
+
   const handleSubmit = (event, inputValue) => {
     event.preventDefault();
     router.push(`/search/${inputValue}`);
@@ -149,7 +148,16 @@ const SearchResults = ({ query }) => {
         <div>
           <SearchInput onSubmit={handleSubmit} />
           {loading ? (
-            <LinearProgress color="primary" />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh",
+              }}
+            >
+              <CircularProgress color="primary" />
+            </div>
           ) : (
             <>
               <Title variant="h5" component="h2">
@@ -163,10 +171,8 @@ const SearchResults = ({ query }) => {
               <List>
                 {data.map(({ title, content, url }) => (
                   <ListItem key={uuidv4()}>
-                    <Link href={url} passHref>
-                      <Title variant="h6" component="a">
-                        {title}
-                      </Title>
+                    <Link href={url} passHref target="_blank">
+                      <Title variant="h6">{title}</Title>
                     </Link>
                     <Url variant="subtitle2" component="span">
                       {new URL(url).hostname}
@@ -188,7 +194,7 @@ const SearchResults = ({ query }) => {
           )}
         </div>
       </Root>
-      <WordDefinition myData={definitions} query={query} />
+      <WordDefinition data={data} />
     </div>
   );
 };

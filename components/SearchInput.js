@@ -13,18 +13,28 @@ const SearchContainer = styled("div")({
   margin: "0 auto",
   marginTop: "50px",
   padding: "10px",
-  backgroundColor: "#f2f2f2",
-  borderRadius: "30px",
-  boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
+  backgroundColor: "#fff",
+  borderRadius: "25px",
+  boxShadow: "0px 1px 6px rgba(32, 33, 36, 0.28)",
+  "&:hover": {
+    boxShadow: "0px 2px 6px rgba(32, 33, 36, 0.3)",
+  },
 });
 
 const SearchInput = styled(InputBase)({
   marginLeft: "10px",
   flex: 1,
+  fontFamily: "Roboto, sans-serif",
 });
 
 const SearchButton = styled(IconButton)({
   padding: "10px",
+  marginLeft: "5px",
+  backgroundColor: "#f2f2f2",
+  borderRadius: "50%",
+  "&:hover": {
+    backgroundColor: "#e8e8e8",
+  },
 });
 
 const UniSearch = styled("h1")({

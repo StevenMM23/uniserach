@@ -8,8 +8,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { v4 as uuidv4 } from "uuid";
 
-const WordDefinition = ({ myData, query }) => {
-  const { definition, emoji, example, image_url, type } = myData;
+const WordDefinition = ({ data }) => {
   const Root = styled(Card)({
     width: "30%",
     margin: "auto",
@@ -37,14 +36,12 @@ const WordDefinition = ({ myData, query }) => {
     margin: "0.5rem",
   });
 
-  console.log(definition);
+  console.log(data);
   return (
     <Root>
       <Header title={query} />
       <Content>
-        <Typography variant="body1" component="p">
-          {definition}
-        </Typography>
+        <Typography variant="body1" component="p"></Typography>
       </Content>
     </Root>
   );
