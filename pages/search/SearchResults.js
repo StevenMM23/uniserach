@@ -20,7 +20,7 @@ const SearchResults = ({ query }) => {
   const [data, setData] = useState([]);
   const router = useRouter();
   const [showScrollTop, setShowScrollTop] = useState(false);
-
+  const [definitions, setDefinitions] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -42,17 +42,21 @@ const SearchResults = ({ query }) => {
 
     async function fetchDefinition() {
       try {
-        const { data } = await axios.post(`/api/owlbot?q=${query}`);
-        console.log(data);
-        setDefinitions(() => data);
-        
+        const response = await axios.post(`/api/owlbot?q=${query}`);
+
+        setDefinitions(() => response.data);
       } catch (error) {
         console.log(error);
       }
     }
 
+    if (data.length === 0) {
+      setDefinitions([]);
+    } else {
+      fetchDefinition();
+    }
+
     fetchData();
-    fetchDefinition();
   }, [query]);
 
   const truncateText = (text, maxLength) => {
@@ -194,7 +198,7 @@ const SearchResults = ({ query }) => {
           )}
         </div>
       </Root>
-      <WordDefinition data={data} />
+      <WordDefinition data={definitions} />
     </div>
   );
 };
