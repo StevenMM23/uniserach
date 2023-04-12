@@ -37,11 +37,29 @@ const WordDefinition = ({ data }) => {
   });
 
   console.log(data);
+
   return (
     <Root>
-      <Header title={query} />
+      <Header />
       <Content>
-        <Typography variant="body1" component="p"></Typography>
+        <Typography variant="body1" component="p">
+          {data && data.length > 0 ? (
+            data.map((x , index) => {
+              return (
+                <div key={uuidv4()}>
+                  
+                  {x.definition ? (
+                    <p>{index + 1} - {x.definition}</p>
+                  ) : (
+                    <p>No definition available</p>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <h1>No data</h1>
+          )}
+        </Typography>
       </Content>
     </Root>
   );
