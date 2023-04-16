@@ -6,21 +6,15 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
-import SearchInput from "@/components/SearchInput";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import IconButton from "@mui/material/IconButton";
-import WordDefinition from "@/components/WordDefinition";
-import { Grid } from "@mui/material";
+import SearchBar from "@/components/SecondarySearchInput";
 
 const SearchResults = ({ query }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const router = useRouter();
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [definitions, setDefinitions] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,24 +34,8 @@ const SearchResults = ({ query }) => {
       }
     }
 
-    async function fetchDefinition() {
-      try {
-        const response = await axios.post(`/api/owlbot?q=${query}`);
-
-        setDefinitions(() => response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    if (data.length === 0) {
-      setDefinitions([]);
-    } else {
-      fetchDefinition();
-    }
-
     fetchData();
-  }, [query]);
+  }, [query, data.length]);
 
   const truncateText = (text, maxLength) => {
     if (!text) return "";
@@ -75,7 +53,7 @@ const SearchResults = ({ query }) => {
 
   const Root = styled("div")(({ theme }) => ({
     margin: "auto",
-    maxWidth: "50%",
+    maxWidth: "100%",
     padding: theme.spacing(2),
   }));
 
@@ -150,7 +128,7 @@ const SearchResults = ({ query }) => {
     <div style={{ display: "flex" }}>
       <Root>
         <div>
-          <SearchInput onSubmit={handleSubmit} />
+          <SearchBar onSubmit={handleSubmit} />
           {loading ? (
             <div
               style={{
@@ -189,16 +167,8 @@ const SearchResults = ({ query }) => {
               </List>
             </>
           )}
-          {showScrollTop && (
-            <ScrollTopButton onClick={handleScrollTop}>
-              <IconButton>
-                <KeyboardArrowUpIcon />
-              </IconButton>
-            </ScrollTopButton>
-          )}
         </div>
       </Root>
-      <WordDefinition data={definitions} />
     </div>
   );
 };

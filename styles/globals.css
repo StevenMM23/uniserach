@@ -1,1 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+html,
+body,
+p,
+h1,
+h2,
+h3 {
+  padding: 0;
+  margin: 0;
+  font-family: "Londrina Shadow", cursive;
+}
